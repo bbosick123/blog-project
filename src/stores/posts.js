@@ -39,6 +39,9 @@ export const usePostStore = defineStore('post', () => {
     })
   }
 
-  // ⭐ 중요: 만든 함수(addPost)를 밖으로 꼭 내보내줘야 해!
-  return { posts, addPost }
+  const deletePost = (id) => {
+    posts.value = posts.value.filter((p) => p.id !== id)
+  }
+
+  return { posts, addPost, deletePost } // 👈 밖으로 내보내기 잊지 말기!
 })
