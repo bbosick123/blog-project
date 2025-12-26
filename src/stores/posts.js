@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const usePostStore = defineStore('post', () => {
+  // 1. 블로그 글 데이터 (목업 데이터)
   const posts = ref([
     {
       id: 1,
@@ -26,5 +27,18 @@ export const usePostStore = defineStore('post', () => {
     },
   ])
 
-  return { posts }
+  // 2. 글 등록하는 함수 (Action)
+  const addPost = (newPost) => {
+    const id = Date.now()
+    posts.value.push({
+      id,
+      title: newPost.title,
+      content: newPost.content,
+      category: newPost.category,
+      views: 0,
+    })
+  }
+
+  // ⭐ 중요: 만든 함수(addPost)를 밖으로 꼭 내보내줘야 해!
+  return { posts, addPost }
 })
