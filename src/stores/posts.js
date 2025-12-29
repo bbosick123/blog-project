@@ -43,5 +43,21 @@ export const usePostStore = defineStore('post', () => {
     posts.value = posts.value.filter((p) => p.id !== id)
   }
 
-  return { posts, addPost, deletePost } // 👈 밖으로 내보내기 잊지 말기!
+  // src/stores/posts.js 내부
+
+  const editPost = (id, updatedData) => {
+    // 1. 수정할 글이 몇 번째 칸에 있는지 확인 (실무 필수 도구!)
+    const index = posts.value.findIndex((p) => p.id === id)
+
+    if (index !== -1) {
+      // 2. 덮어쓰기 신공! 기존 데이터(...복사) 위에 새 데이터(updatedData)를 올림
+      posts.value[index] = {
+        ...posts.value[index], // ID, 조회수 등 기존 정보 유지
+        ...updatedData, // 사용자가 수정한 제목, 내용 등만 덮어쓰기
+      }
+    }
+  }
+
+  // ⚠️ return 부분에 editPost 꼭 추가해줘!
+  return { posts, addPost, deletePost, editPost }
 })

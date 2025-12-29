@@ -8,7 +8,6 @@ const router = useRouter() // 페이지 이동용 🚕
 const store = usePostStore() // 데이터 창고 🏬
 
 // 2. 핵심 로직: 주소창의 id(문자)를 가져와서 숫자(Number)로 변환!
-// (이거 안 하면 못 찾음!)
 const postId = Number(route.params.id)
 
 // 3. 창고에서 내 ID랑 똑같은 글 찾아내기
@@ -17,6 +16,14 @@ const post = store.posts.find((p) => p.id === postId)
 // 목록으로 돌아가기 함수
 const goBack = () => {
   router.push({ name: 'home' })
+}
+
+// ✅ 수정 페이지로 이동하는 함수 (실무 정석: name 기반 이동) [cite: 2025-11-28]
+const goToEdit = () => {
+  router.push({
+    name: 'edit',
+    params: { id: postId },
+  })
 }
 </script>
 
@@ -40,6 +47,7 @@ const goBack = () => {
 
       <div class="btn-area">
         <button class="btn-list" @click="goBack">목록으로</button>
+        <button class="btn-edit" @click="goToEdit">수정하기</button>
       </div>
     </div>
 
@@ -106,7 +114,9 @@ hr {
 
 .btn-area {
   margin-top: 40px;
-  text-align: center;
+  display: flex; /* 버튼들 가로 배치를 위해 flex 추가 */
+  justify-content: center;
+  gap: 12px; /* 버튼 사이 간격 */
 }
 
 .btn-list {
@@ -122,6 +132,23 @@ hr {
 
 .btn-list:hover {
   background-color: #333;
+}
+
+/* ✅ 수정하기 버튼 스타일 */
+.btn-edit {
+  background-color: #42b883;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-edit:hover {
+  background-color: #3aa876;
 }
 
 .not-found {
