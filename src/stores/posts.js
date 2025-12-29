@@ -58,6 +58,21 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
-  // ⚠️ return 부분에 editPost 꼭 추가해줘!
-  return { posts, addPost, deletePost, editPost }
+  // 조회수 증가 함수
+  const increaseView = (id) => {
+    // 1. 배달받은 id로 배열의 몇 번째 칸(index)인지 찾기
+    const index = posts.value.findIndex((p) => p.id === id)
+
+    if (index !== -1) {
+      // 2. ⭐ 용식쓰가 말한 '정의하는' 단계!
+      // 오른쪽 {} 안에서 +1 계산을 먼저 끝내고, 통째로 대입해서 갈아끼움
+      posts.value[index] = {
+        ...posts.value[index],
+        views: posts.value[index].views + 1,
+      }
+    }
+  }
+
+  // 잊지 말고 return에 추가해줘야 밖에서 쓸 수 있어!
+  return { posts, addPost, editPost, increaseView }
 })

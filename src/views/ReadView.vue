@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/posts'
 
@@ -18,13 +19,19 @@ const goBack = () => {
   router.push({ name: 'home' })
 }
 
-// ✅ 수정 페이지로 이동하는 함수 (실무 정석: name 기반 이동) [cite: 2025-11-28]
+// ✅ 수정 페이지로 이동하는 함수 (실무 정석: name 기반 이동)
 const goToEdit = () => {
   router.push({
     name: 'edit',
     params: { id: postId },
   })
 }
+
+// 화면이 딱 켜지는 순간(onMounted) 실행!
+onMounted(() => {
+  // 창고 주인한테 "이 ID 글 조회수 좀 올려줘"라고 주문함
+  store.increaseView(postId)
+})
 </script>
 
 <template>
