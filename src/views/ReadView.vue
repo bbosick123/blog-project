@@ -4,22 +4,28 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/posts'
 
 // 1. 도구들 준비
-const route = useRoute() // 주소 정보(ID) 확인용 🗺️
-const router = useRouter() // 페이지 이동용 🚕
-const store = usePostStore() // 데이터 창고 🏬
+const route = useRoute()
+const router = useRouter()
+const store = usePostStore()
 
-// 2. 핵심 로직: 주소창의 id(문자)를 가져와서 숫자(Number)로 변환!
+// 2. 변수 선언
 const postId = Number(route.params.id)
-
-// 3. 창고에서 내 ID랑 똑같은 글 찾아내기
 const post = store.posts.find((p) => p.id === postId)
 
-// 목록으로 돌아가기 함수
+// 3. 라이프사이클: 화면 켜지면 조회수 상승
+onMounted(() => {
+  if (post) {
+    // 글이 존재할 때만 실행
+    store.increaseView(postId)
+  }
+})
+
+// --- 기능 함수들 ---
+
 const goBack = () => {
   router.push({ name: 'home' })
 }
 
-// ✅ 수정 페이지로 이동하는 함수 (실무 정석: name 기반 이동)
 const goToEdit = () => {
   router.push({
     name: 'edit',
@@ -27,11 +33,18 @@ const goToEdit = () => {
   })
 }
 
-// 화면이 딱 켜지는 순간(onMounted) 실행!
-onMounted(() => {
-  // 창고 주인한테 "이 ID 글 조회수 좀 올려줘"라고 주문함
-  store.increaseView(postId)
-})
+// ✅ 삭제 함수 추가
+const handleDelete = () => {
+  // 1. 사용자에게 확인 받기
+  if (confirm('정말로 이 글을 삭제하시겠습니까?')) {
+    // 2. 창고(Store)에 삭제 명령 내리기
+    store.deletePost(postId)
+
+    // 3. 삭제 완료 후 홈으로 이동
+    alert('삭제되었습니다.')
+    router.push({ name: 'home' })
+  }
+}
 </script>
 
 <template>
@@ -55,6 +68,7 @@ onMounted(() => {
       <div class="btn-area">
         <button class="btn-list" @click="goBack">목록으로</button>
         <button class="btn-edit" @click="goToEdit">수정하기</button>
+        <button class="btn-delete" @click="handleDelete">삭제하기</button>
       </div>
     </div>
 
@@ -67,6 +81,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* 기존 스타일 그대로 유지하고 삭제 버튼 스타일만 추가할게! */
 .read-container {
   max-width: 800px;
   margin: 0 auto;
@@ -80,7 +95,6 @@ onMounted(() => {
 .post-header {
   margin-bottom: 20px;
 }
-
 .category {
   display: inline-block;
   background: #42b883;
@@ -90,72 +104,70 @@ onMounted(() => {
   font-size: 14px;
   margin-bottom: 10px;
 }
-
 h1 {
   font-size: 28px;
   margin: 10px 0;
   color: #333;
 }
-
 .meta-info {
   display: flex;
   gap: 15px;
   color: #999;
   font-size: 14px;
 }
-
 hr {
   border: 0;
   height: 1px;
   background: #eee;
   margin: 30px 0;
 }
-
 .post-content {
   min-height: 200px;
   font-size: 16px;
   line-height: 1.8;
   color: #444;
-  white-space: pre-wrap; /* 엔터 친 거 줄바꿈 적용 */
+  white-space: pre-wrap;
 }
-
 .btn-area {
   margin-top: 40px;
-  display: flex; /* 버튼들 가로 배치를 위해 flex 추가 */
+  display: flex;
   justify-content: center;
-  gap: 12px; /* 버튼 사이 간격 */
+  gap: 12px;
 }
-
+.btn-list,
+.btn-edit,
+.btn-delete {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
 .btn-list {
   background-color: #555;
   color: white;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
 }
-
 .btn-list:hover {
   background-color: #333;
 }
-
-/* ✅ 수정하기 버튼 스타일 */
 .btn-edit {
   background-color: #42b883;
   color: white;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
   font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
 }
-
 .btn-edit:hover {
   background-color: #3aa876;
+}
+
+/* ✅ 삭제 버튼 스타일 (빨간색) */
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+  font-weight: bold;
+}
+.btn-delete:hover {
+  background-color: #c0392b;
 }
 
 .not-found {

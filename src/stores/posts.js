@@ -74,5 +74,5 @@ export const usePostStore = defineStore('post', () => {
   }
 
   // 잊지 말고 return에 추가해줘야 밖에서 쓸 수 있어!
-  return { posts, addPost, editPost, increaseView }
+  return { posts, addPost, editPost, deletePost, increaseView }
 })
