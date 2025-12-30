@@ -23,6 +23,8 @@ const submitPost = () => {
     category: category.value,
   })
 
+  alert('성공적으로 글이 등록되었습니다.')
+
   // ✅ 정석: 이름으로 이동 (Home으로)
   router.push({ name: 'home' })
 }

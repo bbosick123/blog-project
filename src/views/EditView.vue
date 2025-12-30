@@ -44,6 +44,8 @@ const updatePost = () => {
     category: category.value,
   })
 
+  alert('수정이 완료되었습니다.')
+
   // 수정 완료 후 다시 상세 페이지로 이동
   router.push({ name: 'read', params: { id: postId } })
 }

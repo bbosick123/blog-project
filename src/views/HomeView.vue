@@ -11,6 +11,12 @@ const sortedPosts = computed(() => {
   // .sort() -> 정렬하기
   return [...store.posts].sort((a, b) => b.createdAt - a.createdAt)
 })
+
+const handleDelete = (id) => {
+  if (confirm('정말로 이 글을 삭제하시겠습니까?')) {
+    store.deletePost(id)
+  }
+}
 </script>
 
 <template>
@@ -30,7 +36,7 @@ const sortedPosts = computed(() => {
           <span class="category">{{ post.category }}</span>
           <h3>{{ post.title }}</h3>
 
-          <button class="btn-delete" @click.stop="store.deletePost(post.id)">삭제</button>
+          <button class="btn-delete" @click.stop="handleDelete(post.id)">삭제</button>
         </div>
 
         <p>{{ post.content }}</p>
