@@ -1,9 +1,16 @@
 <script setup>
+import { computed } from 'vue' // 1. 정렬 계산을 위해 필요해!
 import { usePostStore } from '@/stores/posts'
 import { useRouter } from 'vue-router'
 
 const store = usePostStore() // 창고 연결
 const router = useRouter() // 이동 도구 연결
+
+const sortedPosts = computed(() => {
+  // [...store.posts] -> 원본 배열을 복사해서 새 배열을 만듦 (원본 보호)
+  // .sort() -> 정렬하기
+  return [...store.posts].sort((a, b) => b.createdAt - a.createdAt)
+})
 </script>
 
 <template>
@@ -15,7 +22,7 @@ const router = useRouter() // 이동 도구 연결
 
     <ul>
       <li
-        v-for="post in store.posts"
+        v-for="post in sortedPosts"
         :key="post.id"
         @click="router.push({ name: 'read', params: { id: post.id } })"
       >

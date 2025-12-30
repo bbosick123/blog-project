@@ -6,6 +6,7 @@ export const usePostStore = defineStore('post', () => {
   const posts = ref([
     {
       id: 1,
+      createdAt: 1,
       title: '첫 번째 글입니다',
       content: 'Vue 3랑 Pinia 공부 중! 처음부터 하니까 이해 잘 되네.',
       views: 0,
@@ -13,6 +14,7 @@ export const usePostStore = defineStore('post', () => {
     },
     {
       id: 2,
+      createdAt: 2,
       title: '면접 준비 꿀팁',
       content: '포트폴리오는 역시 깃허브 잔디 관리가 생명이지.',
       views: 0,
@@ -20,6 +22,7 @@ export const usePostStore = defineStore('post', () => {
     },
     {
       id: 3,
+      createdAt: 3,
       title: '점심 메뉴 추천',
       content: '오늘은 뜨끈한 국밥이 땡긴다.',
       views: 0,
@@ -29,9 +32,11 @@ export const usePostStore = defineStore('post', () => {
 
   // 2. 글 등록하는 함수 (Action)
   const addPost = (newPost) => {
-    const id = Date.now()
+    const now = Date.now() // 현재 시간을 한 번만 딱 찍어서 변수에 담고!
+
     posts.value.push({
-      id,
+      id: now, // ID로도 쓰고
+      createdAt: now, // ⭐ 날짜 정렬용으로도 쓰고!
       title: newPost.title,
       content: newPost.content,
       category: newPost.category,
