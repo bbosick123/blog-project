@@ -1,37 +1,31 @@
 <script setup>
-import { ref, computed } from 'vue' // 1. ref 추가 (검색어 담기용)
+import { ref, computed } from 'vue'
 import { usePostStore } from '@/stores/posts'
 import { useRouter } from 'vue-router'
 
-const store = usePostStore() // 창고 연결
-const router = useRouter() // 이동 도구 연결
+// [1] 방금 만든 검색창 부품(SearchBar) 가져오기!
+import SearchBar from '@/components/SearchBar.vue'
 
-// [1] 검색어를 담을 바구니 (v-model 연결용)
+const store = usePostStore()
+const router = useRouter()
+
 const searchQuery = ref('')
 
-// [2] 실시간 필터링 + 정렬 계산기 (정석 버전)
+// computed 로직은 그대로 유지 (데이터는 사장님이 관리하니까!)
 const filteredPosts = computed(() => {
-  // 1. 먼저 원본을 복사해서 최신순으로 정렬
   const sorted = [...store.posts].sort((a, b) => {
     return b.createdAt - a.createdAt
   })
 
-  // 2. 만약 검색창이 비어있으면? 정렬된 전체 리스트 바로 내보내기
   if (!searchQuery.value) {
     return sorted
   }
 
-  // 3. 검색어가 있으면? 필터링해서 내보내기
   return sorted.filter((post) => {
     const keyword = searchQuery.value.toLowerCase()
     const title = post.title.toLowerCase()
     const content = post.content.toLowerCase()
-
-    // 제목에 키워드가 포함되어 있거나(||) 내용에 포함되어 있으면 합격!
-    const isTitleMatch = title.includes(keyword)
-    const isContentMatch = content.includes(keyword)
-
-    return isTitleMatch || isContentMatch
+    return title.includes(keyword) || content.includes(keyword)
   })
 })
 
@@ -49,15 +43,7 @@ const handleDelete = (id) => {
       <button class="btn-write" @click="router.push({ name: 'write' })">글쓰기</button>
     </div>
 
-    <div class="search-container">
-      <input
-        :value="searchQuery"
-        @input="searchQuery = $event.target.value"
-        type="text"
-        placeholder="검색어를 입력해주세요."
-        class="search-input"
-      />
-    </div>
+    <SearchBar v-model="searchQuery" />
 
     <ul v-if="filteredPosts.length > 0">
       <li
@@ -68,7 +54,6 @@ const handleDelete = (id) => {
         <div class="title-row">
           <span class="category">{{ post.category }}</span>
           <h3>{{ post.title }}</h3>
-
           <button class="btn-delete" @click.stop="handleDelete(post.id)">삭제</button>
         </div>
 
@@ -85,6 +70,11 @@ const handleDelete = (id) => {
 </template>
 
 <style scoped>
+/* [3] CSS 대청소!
+  검색창 관련 스타일(.search-container, .search-input)은 
+  SearchBar.vue로 이사 갔으니까 여기선 싹 지웠어. 훨씬 깔끔하지?
+*/
+
 * {
   box-sizing: border-box;
 }
@@ -104,24 +94,7 @@ const handleDelete = (id) => {
   font-weight: bold;
 }
 
-/* 검색창 스타일 추가 */
-.search-container {
-  margin-bottom: 20px;
-}
-.search-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.search-input:focus {
-  border-color: #42b883;
-}
-
-/* 검색 결과 없음 스타일 */
+/* .no-result 스타일은 리스트랑 관련 있으니 남겨둠 */
 .no-result {
   text-align: center;
   padding: 50px 0;
