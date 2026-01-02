@@ -1,15 +1,38 @@
 <script setup>
-import { computed } from 'vue' // 1. 정렬 계산을 위해 필요해!
+import { ref, computed } from 'vue' // 1. ref 추가 (검색어 담기용)
 import { usePostStore } from '@/stores/posts'
 import { useRouter } from 'vue-router'
 
 const store = usePostStore() // 창고 연결
 const router = useRouter() // 이동 도구 연결
 
-const sortedPosts = computed(() => {
-  // [...store.posts] -> 원본 배열을 복사해서 새 배열을 만듦 (원본 보호)
-  // .sort() -> 정렬하기
-  return [...store.posts].sort((a, b) => b.createdAt - a.createdAt)
+// [1] 검색어를 담을 바구니 (v-model 연결용)
+const searchQuery = ref('')
+
+// [2] 실시간 필터링 + 정렬 계산기 (정석 버전)
+const filteredPosts = computed(() => {
+  // 1. 먼저 원본을 복사해서 최신순으로 정렬
+  const sorted = [...store.posts].sort((a, b) => {
+    return b.createdAt - a.createdAt
+  })
+
+  // 2. 만약 검색창이 비어있으면? 정렬된 전체 리스트 바로 내보내기
+  if (!searchQuery.value) {
+    return sorted
+  }
+
+  // 3. 검색어가 있으면? 필터링해서 내보내기
+  return sorted.filter((post) => {
+    const keyword = searchQuery.value.toLowerCase()
+    const title = post.title.toLowerCase()
+    const content = post.content.toLowerCase()
+
+    // 제목에 키워드가 포함되어 있거나(||) 내용에 포함되어 있으면 합격!
+    const isTitleMatch = title.includes(keyword)
+    const isContentMatch = content.includes(keyword)
+
+    return isTitleMatch || isContentMatch
+  })
 })
 
 const handleDelete = (id) => {
@@ -26,9 +49,19 @@ const handleDelete = (id) => {
       <button class="btn-write" @click="router.push({ name: 'write' })">글쓰기</button>
     </div>
 
-    <ul>
+    <div class="search-container">
+      <input
+        :value="searchQuery"
+        @input="searchQuery = $event.target.value"
+        type="text"
+        placeholder="검색어를 입력해주세요."
+        class="search-input"
+      />
+    </div>
+
+    <ul v-if="filteredPosts.length > 0">
       <li
-        v-for="post in sortedPosts"
+        v-for="post in filteredPosts"
         :key="post.id"
         @click="router.push({ name: 'read', params: { id: post.id } })"
       >
@@ -41,13 +74,20 @@ const handleDelete = (id) => {
 
         <p>{{ post.content }}</p>
         <small>조회수: {{ post.views }}</small>
+        <span v-if="post.views >= 10">🔥</span>
       </li>
     </ul>
+
+    <div v-else class="no-result">
+      <p>보여줄 글이 없습니다. 검색어를 확인해 보세요! 😅</p>
+    </div>
   </main>
 </template>
 
 <style scoped>
-/* 기존 스타일 유지하면서, 삭제 버튼용 스타일 추가 */
+* {
+  box-sizing: border-box;
+}
 .header {
   display: flex;
   justify-content: space-between;
@@ -63,6 +103,31 @@ const handleDelete = (id) => {
   cursor: pointer;
   font-weight: bold;
 }
+
+/* 검색창 스타일 추가 */
+.search-container {
+  margin-bottom: 20px;
+}
+.search-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus {
+  border-color: #42b883;
+}
+
+/* 검색 결과 없음 스타일 */
+.no-result {
+  text-align: center;
+  padding: 50px 0;
+  color: #888;
+}
+
 ul {
   list-style: none;
   padding: 0;
@@ -103,7 +168,6 @@ small {
   color: #aaa;
 }
 
-/* 빨간색 삭제 버튼 */
 .btn-delete {
   background-color: #ff4d4d;
   color: white;
@@ -112,7 +176,7 @@ small {
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
-  margin-left: auto; /* 오른쪽 끝으로 밀기 */
+  margin-left: auto;
 }
 .btn-delete:hover {
   background-color: #cc0000;

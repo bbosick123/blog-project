@@ -85,7 +85,7 @@ const handleDelete = () => {
 .read-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 40px;
   border: 1px solid #ddd;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
