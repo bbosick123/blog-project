@@ -19,7 +19,6 @@ defineEmits(['update:modelValue'])
 </template>
 
 <style scoped>
-/* HomeView.vue에 있던 검색창 관련 스타일만 여기로 이사 왔어! */
 .search-container {
   margin-bottom: 20px;
 }
